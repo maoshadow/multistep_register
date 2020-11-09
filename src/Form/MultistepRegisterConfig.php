@@ -219,7 +219,7 @@ class MultistepRegisterConfig extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->messenger()->addStatus($this->t('Los cambios se han almacenado correctamente.'));
+    $this->messenger()->addStatus($this->t('All changes have been stored correctly.'));
     $fields = $form_state->getValue('fields');
     $this->config('multistep_register.config')
       ->set('fields', $fields)
