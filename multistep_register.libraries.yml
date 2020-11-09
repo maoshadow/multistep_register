@@ -1,0 +1,10 @@
+multistep_form:
+  version: 1.0.0
+  css:
+    theme:
+      css/custom_form.css: {}
+  js:
+    js/registerajax.js: {}
+  dependencies:
+    - core/drupal.ajax
+

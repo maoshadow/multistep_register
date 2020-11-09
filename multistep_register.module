@@ -1,0 +1,146 @@
+<?php
+
+/**
+ * @file
+ * Contains multistep_register.module.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function multistep_register_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() === 'user') {
+    $fields = [];
+    $configFields = \Drupal::config("multistep_register.config")->get('fields');
+    if ($configFields) {
+      foreach ($configFields as $field) {
+        $machineName = str_replace(' ', '_', strtolower($field['machine_name']));
+        $required = (bool) $field['required'];
+        switch ($field['type']) {
+          case 'textfield':
+            $fields[$machineName] = BaseFieldDefinition::create('string')
+              ->setLabel($field['label'])
+              ->setRequired($required)
+              ->setDisplayOptions('form', [
+                'type' => 'string',
+                'weight' => -5,
+              ])
+              ->setDisplayConfigurable('form', TRUE)
+              ->setTranslatable(TRUE);
+            break;
+
+          case 'select':
+            if (!empty($field['taxonomy_vocabulary'])) {
+              $fields[$machineName] = BaseFieldDefinition::create('entity_reference')
+                ->setLabel($field['label'])
+                ->setRequired($required)
+                ->setSetting('target_type', 'taxonomy_term')
+                ->setSetting('handler_settings', [
+                  'target_bundles' => [$field['taxonomy_vocabulary'] => $field['taxonomy_vocabulary']],
+                  'auto_create' => FALSE,
+                ])
+                ->setDisplayOptions('form', [
+                  'type' => 'options_select',
+                  'weight' => -5,
+                  'settings' => [
+                    'size' => '128',
+                    'placeholder' => '',
+                  ],
+                ])
+                ->setDisplayConfigurable('form', TRUE)
+                ->setTranslatable(TRUE);
+            }
+            break;
+
+          case 'date':
+            $fields[$machineName] = BaseFieldDefinition::create('datetime')
+              ->setLabel($field['label'])
+              ->setSettings([
+                  'datetime_type' => 'date'
+              ])
+              ->setDefaultValue('')
+              ->setRequired($required)
+              ->setDisplayOptions('form', [
+                'type' => 'datetime_default',
+                'settings' => [
+                  'format_type' => 'medium',
+                ],
+                'weight' => -5,
+              ])
+              ->setDisplayConfigurable('form', TRUE);
+            break;
+
+          case 'number':
+            $fields[$machineName] = BaseFieldDefinition::create('float')
+              ->setLabel($field['label'])
+              ->setRequired($required)
+              ->setDisplayOptions('form', [
+                'type' => 'number',
+                'weight' => -5,
+              ])
+              ->setDisplayConfigurable('form', TRUE)
+              ->setTranslatable(TRUE);
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
+    return $fields;
+  }
+}
+
+/**
+ * Implements hooks_install().
+ */
+function multistep_register_install() {
+
+  $vocabulary = 'gender';
+  $items = [
+    'Male',
+    'Female',
+    'Not specified',
+  ];
+  foreach ($items as $item) {
+    $term = Term::create([
+      'parent' => [],
+      'name' => $item,
+      'vid' => $vocabulary,
+    ])->save();
+  }
+  $entity = \Drupal::service('entity_type.manager')->getDefinition('user');
+  $fieldDefinitions = multistep_register_entity_base_field_info($entity);
+  foreach ($fieldDefinitions as $key => $field) {
+    \Drupal::entityDefinitionUpdateManager()
+      ->installFieldStorageDefinition($key, 'user', 'user', $field);
+  }
+  \Drupal::service('entity.definition_update_manager')->updateEntityType($entity);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function multistep_register_uninstall() {
+
+  $configFields = \Drupal::config("multistep_register.config")->get('fields');
+  $updateManager = \Drupal::entityDefinitionUpdateManager();
+  foreach ($configFields as $field) {
+    if ($fieldStorageDefinition = $updateManager->getFieldStorageDefinition($field['machine_name'], 'user')) {
+      $updateManager->uninstallFieldStorageDefinition($fieldStorageDefinition);
+    }
+  }
+
+  $vocabulary = Vocabulary::load('gender');
+  if ($vocabulary) {
+    $vocabulary->delete();
+  }
+
+  $entity_type = \Drupal::service('entity_type.manager')->getDefinition('user');
+  \Drupal::service('entity.definition_update_manager')->updateEntityType($entity_type);
+}

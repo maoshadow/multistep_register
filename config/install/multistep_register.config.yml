@@ -1,0 +1,43 @@
+fields:
+  step_1_data_0:
+    machine_name: 'first_name'
+    label: 'First name'
+    type: 'textfield'
+    taxonomy_vocabulary: '0'
+    required: '1'
+  step_1_data_1:
+    machine_name: 'last_name'
+    label: 'last_name'
+    type: 'textfield'
+    taxonomy_vocabulary: '0'
+    required: '1'
+  step_1_data_2:
+    machine_name: 'gender'
+    label: 'Gender'
+    type: 'select'
+    taxonomy_vocabulary: 'gender'
+    required: '1'
+  step_1_data_3:
+    machine_name: 'date_of_birth'
+    label: 'Date of birth'
+    type: date
+    taxonomy_vocabulary: '0'
+    required: '1'
+  step_2_data_0:
+    machine_name: 'city'
+    label: 'City'
+    type: 'textfield'
+    taxonomy_vocabulary: '0'
+    required: '1'
+  step_2_data_1:
+    machine_name: 'phone_number'
+    label: 'Phone Number'
+    type: 'number'
+    taxonomy_vocabulary: '0'
+    required: '0'
+  step_2_data_2:
+    machine_name: 'address'
+    label: 'Address'
+    type: 'textfield'
+    taxonomy_vocabulary: '0'
+    required: '0'

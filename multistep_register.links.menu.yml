@@ -1,0 +1,6 @@
+multistep_register.config:
+  title: 'Multistep configuration'
+  route_name: multistep_register.config
+  description: 'General fields configuration for multistep register form'
+  parent: system.admin
+  weight: 50

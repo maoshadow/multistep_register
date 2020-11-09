@@ -1,0 +1,17 @@
+multistep_register.multistep_form:
+  path: '/multistep/register'
+  defaults:
+    _form: 'Drupal\multistep_register\Form\MultistepForm'
+    _title: 'Multistep Register form'
+  requirements:
+    _permission: 'access content'
+
+multistep_register.config:
+  path: '/admin/config/multistep_register/settings'
+  defaults:
+    _form: '\Drupal\multistep_register\Form\MultistepRegisterConfig'
+    _title: 'General Configurations for each step fields'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE

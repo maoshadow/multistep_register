@@ -1,0 +1,6 @@
+name: multistep register
+description: Create an ajax form for regiter user with a multistep ajax ui
+package: Zemoga Tech test
+type: module
+core: 8.x
+configure: multistep_register.config
